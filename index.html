@@ -7,114 +7,67 @@
 <meta name="theme-color" content="#0b0b0b">
 <title>PhotoCuh — AI Object Remover</title>
 <style>
-:root {
-  --bg:#0b0b0b; --panel:#171717; --yellow:#ffe04b;
-  --muted:#a5a5a5; --line:#303030; --red:#ff5252;
-}
-* { box-sizing:border-box; }
-body {
-  margin:0; background:var(--bg); color:#fff;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-}
-button,input { font:inherit; }
-button { cursor:pointer; }
-button:disabled { opacity:.5; cursor:not-allowed; }
-header {
-  padding:22px 16px; border-bottom:1px solid var(--line);
-  text-align:center;
-}
-.logo { font-size:27px; font-weight:900; letter-spacing:-1px; }
-.logo span { color:var(--yellow); }
-header p { color:var(--muted); margin:7px 0 0; font-size:13px; }
-main { width:min(100% - 24px,850px); margin:24px auto 50px; }
-.intro { text-align:center; margin-bottom:22px; }
-h1 { font-size:clamp(25px,6vw,38px); margin:0 0 9px; }
-.intro p { color:var(--muted); font-size:14px; line-height:1.6; }
-.panel {
-  background:var(--panel); border:1px solid var(--line);
-  border-radius:18px; padding:15px; margin-bottom:16px;
-}
-.section-title { font-size:16px; font-weight:800; margin:0 0 12px; }
-.upload-button,.primary {
-  width:100%; border:0; border-radius:12px; padding:15px;
-  font-weight:850; background:var(--yellow); color:#111;
-}
-.secondary {
-  background:#242424; color:#fff; border:1px solid #3b3b3b;
-  border-radius:10px; padding:11px 13px; font-weight:700;
-}
-.tools { display:flex; flex-wrap:wrap; gap:9px; margin:13px 0; }
-.tools button { flex:1; min-width:95px; }
-.brush-row {
-  display:flex; align-items:center; justify-content:space-between;
-  gap:12px; color:var(--muted); font-size:13px; margin:12px 0;
-}
-input[type="range"] { width:55%; accent-color:var(--yellow); }
-.canvas-wrap {
-  position:relative; overflow:hidden; border-radius:12px;
-  background:#090909; border:1px solid #333; min-height:120px;
-}
-canvas,.result-image {
-  display:block; width:100%; height:auto; max-height:65vh;
-  object-fit:contain;
-}
-#editor { touch-action:none; cursor:crosshair; }
-.empty {
-  padding:45px 12px; text-align:center; color:#858585;
-  font-size:13px; line-height:1.7;
-}
-#status {
-  color:var(--muted); font-size:13px; line-height:1.6;
-  margin:12px 0 0; overflow-wrap:anywhere;
-}
-#status.error { color:#ff8888; }
-#status.success { color:#9cf0b5; }
-#resultPanel { display:none; }
-.result-grid {
-  display:grid; grid-template-columns:1fr 1fr; gap:10px;
-}
-.result-grid h3 { font-size:13px; margin:0 0 9px; }
-.result-image { border-radius:9px; border:1px solid #333; }
-.download { display:block; text-align:center; text-decoration:none;
-  margin-top:13px; }
-.note { font-size:12px; line-height:1.6; color:var(--muted); }
-footer { text-align:center; color:#777; font-size:12px; padding:10px 20px 30px; }
-@media(max-width:430px) {
-  main { width:calc(100% - 18px); margin-top:17px; }
-  .panel { padding:11px; border-radius:14px; }
-  .result-grid { grid-template-columns:1fr; }
-  .tools button { min-width:80px; padding:10px 8px; }
-}
+:root{--bg:#0b0b0b;--panel:#171717;--yellow:#ffe04b;--muted:#aaa;--line:#303030}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:white;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+header{text-align:center;padding:22px 12px;border-bottom:1px solid var(--line)}
+.logo{font-size:28px;font-weight:900;letter-spacing:-1px}
+.logo span{color:var(--yellow)}
+header p,.note{color:var(--muted);font-size:13px}
+main{width:min(100% - 20px,850px);margin:24px auto 40px}
+.intro{text-align:center;margin-bottom:22px}
+h1{font-size:clamp(27px,6vw,38px);margin:0 0 10px}
+.intro p{font-size:14px;color:var(--muted);line-height:1.6}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:15px;margin-bottom:16px}
+h2{font-size:18px;margin:0 0 13px}
+.upload,.primary{width:100%;border:0;border-radius:12px;padding:16px;background:var(--yellow);color:#111;font-weight:900}
+.secondary{background:#242424;color:white;border:1px solid #3b3b3b;border-radius:10px;padding:12px;font-weight:750}
+.tools{display:flex;gap:9px;flex-wrap:wrap;margin:13px 0}
+.tools button{flex:1;min-width:85px}
+.brush-row{display:flex;align-items:center;gap:10px;justify-content:space-between;margin:15px 0;color:var(--muted);font-size:13px}
+input[type=range]{width:48%;accent-color:var(--yellow)}
+.canvas-wrap{overflow:hidden;border:1px solid #333;border-radius:12px;background:#080808}
+#editor{display:block;width:100%;height:auto;max-height:65vh;object-fit:contain;touch-action:none;cursor:crosshair}
+.empty{padding:45px 10px;text-align:center;color:#888;font-size:13px;line-height:1.8}
+#status{font-size:13px;line-height:1.6;color:var(--muted);overflow-wrap:anywhere;margin:13px 0 0}
+#status.error{color:#ff8585}
+#status.success{color:#91edb0}
+#resultPanel{display:none}
+.results{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.results h3{font-size:13px}
+.results canvas,.results img{width:100%;height:auto;display:block;border-radius:8px;border:1px solid #333}
+.download{display:block;text-align:center;text-decoration:none;margin-top:14px}
+.note{line-height:1.6}
+footer{text-align:center;color:#777;font-size:12px;padding:20px}
+@media(max-width:430px){main{margin-top:16px}.panel{padding:12px}.results{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header>
   <div class="logo">Photo<span>Cuh</span></div>
-  <p>Remove unwanted objects with AI.</p>
+  <p>AI object removal</p>
 </header>
 
 <main>
   <div class="intro">
     <h1>Remove anything.</h1>
-    <p>Upload a photo, paint over an unwanted object, and let AI clean it up.</p>
+    <p>Choose a photo, paint over an unwanted object, and let AI remove it.</p>
   </div>
 
   <section class="panel">
-    <h2 class="section-title">1. Choose your photo</h2>
-
+    <h2>1. Choose your photo</h2>
     <input id="fileInput" type="file" accept="image/*"
-      style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
-
-    <button id="uploadButton" class="upload-button" type="button">
-      ＋ Choose a photo
-    </button>
-
-    <p class="note">Choose a photo from your iPhone's photo library or Files.</p>
+      style="display:none">
+    <button id="uploadButton" class="upload" type="button">＋ Choose a photo</button>
+    <p class="note">Choose an image from Photos or Files on your iPhone.</p>
   </section>
 
   <section class="panel">
-    <h2 class="section-title">2. Paint over the object</h2>
-    <p class="note">Paint over everything you want removed. The red area marks your selection.</p>
+    <h2>2. Paint over the object</h2>
+    <p class="note">Only the area you paint will be marked red.</p>
 
     <div class="brush-row">
       <label for="brushSize">Brush size</label>
@@ -123,39 +76,27 @@ footer { text-align:center; color:#777; font-size:12px; padding:10px 20px 30px; 
     </div>
 
     <div class="canvas-wrap">
-      <div id="emptyState" class="empty">
-        Your photo will appear here.<br>Choose a photo to get started.
-      </div>
+      <div id="emptyState" class="empty">Your photo will appear here.</div>
       <canvas id="editor" hidden></canvas>
     </div>
 
     <div class="tools">
-      <button id="undoButton" class="secondary" type="button" disabled>↶ Undo</button>
-      <button id="clearButton" class="secondary" type="button" disabled>Clear selection</button>
-      <button id="newButton" class="secondary" type="button">New photo</button>
+      <button id="undoButton" class="secondary" disabled>↶ Undo</button>
+      <button id="clearButton" class="secondary" disabled>Clear selection</button>
+      <button id="newButton" class="secondary">New photo</button>
     </div>
 
-    <button id="startButton" class="primary" type="button" disabled>
-      ✦ START CLEANING
-    </button>
+    <button id="startButton" class="primary" disabled>✦ START CLEANING</button>
     <p id="status" role="status" aria-live="polite">Choose a photo to begin.</p>
   </section>
 
   <section id="resultPanel" class="panel">
-    <h2 class="section-title">3. Your result</h2>
-    <div class="result-grid">
-      <div>
-        <h3>BEFORE</h3>
-        <canvas id="beforeCanvas" class="result-image"></canvas>
-      </div>
-      <div>
-        <h3>AFTER AI CLEANING</h3>
-        <img id="resultImage" class="result-image" alt="AI-cleaned photo">
-      </div>
+    <h2>3. Your result</h2>
+    <div class="results">
+      <div><h3>BEFORE</h3><canvas id="beforeCanvas"></canvas></div>
+      <div><h3>AFTER</h3><img id="resultImage" alt="AI-cleaned photo"></div>
     </div>
-    <a id="downloadButton" class="upload-button download" download="photocuh-cleaned.png">
-      ↓ Download cleaned photo
-    </a>
+    <a id="downloadButton" class="upload download" download="photocuh-cleaned.png">↓ Download cleaned photo</a>
   </section>
 </main>
 
@@ -163,311 +104,282 @@ footer { text-align:center; color:#777; font-size:12px; padding:10px 20px 30px; 
 
 <script>
 (() => {
-  "use strict";
+"use strict";
 
-  const $ = id => document.getElementById(id);
+const API_URL = "https://YOUR-PROJECT.vercel.app/api/remove";
 
-  const fileInput = $("fileInput");
-  const uploadButton = $("uploadButton");
-  const editor = $("editor");
-  const ctx = editor.getContext("2d");
-  const maskCanvas = document.createElement("canvas");
-  const maskCtx = maskCanvas.getContext("2d", { willReadFrequently:true });
-  const sourceCanvas = document.createElement("canvas");
-  const sourceCtx = sourceCanvas.getContext("2d");
-  const beforeCanvas = $("beforeCanvas");
-  const beforeCtx = beforeCanvas.getContext("2d");
+const $ = id => document.getElementById(id);
+const fileInput = $("fileInput");
+const editor = $("editor");
+const ctx = editor.getContext("2d");
+const source = document.createElement("canvas");
+const sourceCtx = source.getContext("2d");
+const mask = document.createElement("canvas");
+const maskCtx = mask.getContext("2d");
+let loaded = false, working = false, drawing = false;
+let strokes = [], activeStroke = null, imageData = "";
 
-  let loaded = false;
-  let drawing = false;
-  let working = false;
-  let strokes = [];
-  let currentStroke = null;
-  let originalDataUrl = "";
-  let resultDataUrl = "";
+function say(message, type="") {
+  $("status").textContent = message;
+  $("status").className = type;
+}
 
-  function say(message, type = "") {
-    $("status").textContent = message;
-    $("status").className = type;
-  }
+function buttons() {
+  $("startButton").disabled = !loaded || working || strokes.length === 0;
+  $("undoButton").disabled = !loaded || working || strokes.length === 0;
+  $("clearButton").disabled = !loaded || working || strokes.length === 0;
+  $("uploadButton").disabled = working;
+}
 
-  function updateButtons() {
-    $("startButton").disabled = !loaded || working || strokes.length === 0;
-    $("undoButton").disabled = !loaded || working || strokes.length === 0;
-    $("clearButton").disabled = !loaded || working || strokes.length === 0;
-    uploadButton.disabled = working;
-  }
+$("uploadButton").addEventListener("click", () => {
+  if (!working) fileInput.click();
+});
 
-  function openPicker() {
-    if (!working) fileInput.click();
-  }
-
-  uploadButton.addEventListener("click", openPicker);
-
-  fileInput.addEventListener("change", () => {
-    const file = fileInput.files && fileInput.files[0];
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      say("Please choose an image file.", "error");
-      fileInput.value = "";
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(file);
-    const image = new Image();
-
-    image.onload = () => {
-      try {
-        // Limit image size so the server request is less likely to be too large.
-        const scale = Math.min(
-          1,
-          1400 / Math.max(image.naturalWidth, image.naturalHeight),
-          Math.sqrt(1000000 / (image.naturalWidth * image.naturalHeight))
-        );
-
-        const width = Math.max(1, Math.round(image.naturalWidth * scale));
-        const height = Math.max(1, Math.round(image.naturalHeight * scale));
-
-        sourceCanvas.width = width;
-        sourceCanvas.height = height;
-        sourceCtx.clearRect(0, 0, width, height);
-        sourceCtx.drawImage(image, 0, 0, width, height);
-
-        editor.width = width;
-        editor.height = height;
-        maskCanvas.width = width;
-        maskCanvas.height = height;
-        maskCtx.fillStyle = "#000";
-        maskCtx.fillRect(0, 0, width, height);
-
-        originalDataUrl = sourceCanvas.toDataURL("image/jpeg", 0.82);
-        strokes = [];
-        currentStroke = null;
-        loaded = true;
-
-        $("emptyState").hidden = true;
-        editor.hidden = false;
-        $("resultPanel").style.display = "none";
-
-        renderEditor();
-        updateButtons();
-        say("Photo loaded! Paint over the object you want removed.", "success");
-      } catch (error) {
-        console.error(error);
-        say("Could not load that photo. Try a different image.", "error");
-      } finally {
-        URL.revokeObjectURL(objectUrl);
-        fileInput.value = "";
-      }
-    };
-
-    image.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      fileInput.value = "";
-      say("This photo could not be opened. Try another image.", "error");
-    };
-
-    image.src = objectUrl;
-  });
-
-  function redrawMask() {
-    maskCtx.globalCompositeOperation = "source-over";
-    maskCtx.fillStyle = "#000";
-    maskCtx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
-
-    for (const stroke of strokes) {
-      if (!stroke.points.length) continue;
-
-      maskCtx.beginPath();
-      maskCtx.lineCap = "round";
-      maskCtx.lineJoin = "round";
-      maskCtx.lineWidth = stroke.size;
-      maskCtx.strokeStyle = "#fff";
-      maskCtx.fillStyle = "#fff";
-
-      const first = stroke.points[0];
-      maskCtx.moveTo(first.x, first.y);
-
-      if (stroke.points.length === 1) {
-        maskCtx.arc(first.x, first.y, stroke.size / 2, 0, Math.PI * 2);
-        maskCtx.fill();
-      } else {
-        for (let i = 1; i < stroke.points.length; i++) {
-          maskCtx.lineTo(stroke.points[i].x, stroke.points[i].y);
-        }
-        maskCtx.stroke();
-      }
-    }
-  }
-
-  function renderEditor() {
-    if (!loaded) return;
-    ctx.clearRect(0, 0, editor.width, editor.height);
-    ctx.drawImage(sourceCanvas, 0, 0);
-
-    // Red overlay shows the selected area; the API receives the separate black/white mask.
-    const overlay = document.createElement("canvas");
-    overlay.width = maskCanvas.width;
-    overlay.height = maskCanvas.height;
-    const overlayCtx = overlay.getContext("2d");
-    overlayCtx.drawImage(maskCanvas, 0, 0);
-    overlayCtx.globalCompositeOperation = "source-in";
-    overlayCtx.fillStyle = "rgba(255, 55, 65, 0.60)";
-    overlayCtx.fillRect(0, 0, overlay.width, overlay.height);
-
-    ctx.drawImage(overlay, 0, 0);
-  }
-
-  function getPoint(event) {
-    const rect = editor.getBoundingClientRect();
-    return {
-      x: Math.max(0, Math.min(editor.width,
-        (event.clientX - rect.left) * editor.width / rect.width)),
-      y: Math.max(0, Math.min(editor.height,
-        (event.clientY - rect.top) * editor.height / rect.height))
-    };
-  }
-
-  editor.addEventListener("pointerdown", event => {
-    if (!loaded || working) return;
-    event.preventDefault();
-    drawing = true;
-    editor.setPointerCapture(event.pointerId);
-
-    currentStroke = {
-      size: Number($("brushSize").value),
-      points: [getPoint(event)]
-    };
-    strokes.push(currentStroke);
-    redrawMask();
-    renderEditor();
-    updateButtons();
-  });
-
-  editor.addEventListener("pointermove", event => {
-    if (!drawing || !currentStroke) return;
-    event.preventDefault();
-    currentStroke.points.push(getPoint(event));
-    redrawMask();
-    renderEditor();
-  });
-
-  function finishStroke() {
-    if (!drawing) return;
-    drawing = false;
-    currentStroke = null;
-    updateButtons();
-  }
-
-  editor.addEventListener("pointerup", finishStroke);
-  editor.addEventListener("pointercancel", finishStroke);
-  editor.addEventListener("lostpointercapture", finishStroke);
-
-  $("brushSize").addEventListener("input", () => {
-    $("brushLabel").textContent = $("brushSize").value + " px";
-  });
-
-  $("undoButton").addEventListener("click", () => {
-    if (working || !strokes.length) return;
-    strokes.pop();
-    redrawMask();
-    renderEditor();
-    updateButtons();
-    say(strokes.length ? "Last brush stroke undone." : "Selection cleared.");
-  });
-
-  $("clearButton").addEventListener("click", () => {
-    if (working) return;
-    strokes = [];
-    redrawMask();
-    renderEditor();
-    updateButtons();
-    say("Selection cleared. Paint over the object again.");
-  });
-
-  $("newButton").addEventListener("click", () => {
-    if (working) return;
-    loaded = false;
-    strokes = [];
-    currentStroke = null;
-    originalDataUrl = "";
-    resultDataUrl = "";
-    editor.hidden = true;
-    $("emptyState").hidden = false;
-    $("resultPanel").style.display = "none";
+fileInput.addEventListener("change", () => {
+  const file = fileInput.files && fileInput.files[0];
+  if (!file) return;
+  if (!file.type.startsWith("image/")) {
+    say("Please select an image file.", "error");
     fileInput.value = "";
-    updateButtons();
-    say("Choose a photo to begin.");
-    openPicker();
-  });
+    return;
+  }
 
-  $("startButton").addEventListener("click", async () => {
-    if (!loaded || working || !strokes.length) return;
+  const url = URL.createObjectURL(file);
+  const img = new Image();
 
-    working = true;
-    updateButtons();
-    $("startButton").textContent = "AI CLEANING…";
-    say("Sending your photo to the AI. Please wait…");
-
+  img.onload = () => {
     try {
-      redrawMask();
+      const scale = Math.min(
+        1,
+        1400 / Math.max(img.naturalWidth, img.naturalHeight),
+        Math.sqrt(900000 / (img.naturalWidth * img.naturalHeight))
+      );
+      const w = Math.max(1, Math.round(img.naturalWidth * scale));
+      const h = Math.max(1, Math.round(img.naturalHeight * scale));
 
-      const maskData = maskCanvas.toDataURL("image/png");
+      source.width = w;
+      source.height = h;
+      sourceCtx.clearRect(0, 0, w, h);
+      sourceCtx.drawImage(img, 0, 0, w, h);
 
-      if (originalDataUrl.length + maskData.length > 3900000) {
-        throw new Error("This photo is too large to send. Try a smaller image.");
-      }
+      editor.width = w;
+      editor.height = h;
+      mask.width = w;
+      mask.height = h;
+      maskCtx.fillStyle = "#000";
+      maskCtx.fillRect(0, 0, w, h);
 
-      const response = await fetch("/api/remove", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          imageData: originalDataUrl,
-          maskData: maskData
-        })
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "AI cleaning failed.");
-      }
-
-      if (!result.imageData) {
-        throw new Error("The AI did not return a cleaned image.");
-      }
-
-      const cleaned = new Image();
-
-      await new Promise((resolve, reject) => {
-        cleaned.onload = resolve;
-        cleaned.onerror = () => reject(new Error("Could not display the cleaned photo."));
-        cleaned.src = result.imageData;
-      });
-
-      beforeCanvas.width = sourceCanvas.width;
-      beforeCanvas.height = sourceCanvas.height;
-      beforeCtx.drawImage(sourceCanvas, 0, 0);
-
-      $("resultImage").src = result.imageData;
-      resultDataUrl = result.imageData;
-      $("downloadButton").href = resultDataUrl;
-      $("downloadButton").download = "photocuh-cleaned.png";
-      $("resultPanel").style.display = "block";
-      say("Done! Your cleaned photo is ready to view and download.", "success");
-      $("resultPanel").scrollIntoView({ behavior: "smooth", block: "start" });
-    } catch (error) {
-      console.error("PhotoCuh error:", error);
-      say(error.message || "Cleaning failed. Please try again.", "error");
+      imageData = source.toDataURL("image/jpeg", 0.78);
+      strokes = [];
+      loaded = true;
+      $("emptyState").hidden = true;
+      editor.hidden = false;
+      $("resultPanel").style.display = "none";
+      render();
+      buttons();
+      say("Photo loaded! Paint over the object you want removed.", "success");
+    } catch (e) {
+      console.error(e);
+      say("Could not load that photo. Try another one.", "error");
     } finally {
-      working = false;
-      $("startButton").textContent = "✦ START CLEANING";
-      updateButtons();
+      URL.revokeObjectURL(url);
+      fileInput.value = "";
     }
-  });
+  };
 
-  updateButtons();
+  img.onerror = () => {
+    URL.revokeObjectURL(url);
+    fileInput.value = "";
+    say("Could not open this image. Try another photo.", "error");
+  };
+  img.src = url;
+});
+
+function redrawMask() {
+  maskCtx.globalCompositeOperation = "source-over";
+  maskCtx.fillStyle = "#000";
+  maskCtx.fillRect(0, 0, mask.width, mask.height);
+
+  for (const stroke of strokes) {
+    if (!stroke.points.length) continue;
+    maskCtx.beginPath();
+    maskCtx.lineCap = "round";
+    maskCtx.lineJoin = "round";
+    maskCtx.lineWidth = stroke.size;
+    maskCtx.strokeStyle = "#fff";
+    maskCtx.fillStyle = "#fff";
+
+    const first = stroke.points[0];
+    if (stroke.points.length === 1) {
+      maskCtx.arc(first.x, first.y, stroke.size / 2, 0, Math.PI * 2);
+      maskCtx.fill();
+    } else {
+      maskCtx.moveTo(first.x, first.y);
+      for (let i = 1; i < stroke.points.length; i++) {
+        maskCtx.lineTo(stroke.points[i].x, stroke.points[i].y);
+      }
+      maskCtx.stroke();
+    }
+  }
+}
+
+function render() {
+  if (!loaded) return;
+  ctx.clearRect(0, 0, editor.width, editor.height);
+  ctx.drawImage(source, 0, 0);
+
+  // Read the mask alpha. The mask itself is black outside the selection,
+  // so only the white painted pixels become red in the preview.
+  const pixels = maskCtx.getImageData(0, 0, mask.width, mask.height);
+  const overlay = ctx.createImageData(editor.width, editor.height);
+
+  for (let i = 0; i < pixels.data.length; i += 4) {
+    const alpha = pixels.data[i] > 0 ? 150 : 0;
+    overlay.data[i] = 255;
+    overlay.data[i + 1] = 45;
+    overlay.data[i + 2] = 60;
+    overlay.data[i + 3] = alpha;
+  }
+
+  const temp = document.createElement("canvas");
+  temp.width = editor.width;
+  temp.height = editor.height;
+  temp.getContext("2d").putImageData(overlay, 0, 0);
+  ctx.drawImage(temp, 0, 0);
+}
+
+function point(event) {
+  const r = editor.getBoundingClientRect();
+  return {
+    x: Math.max(0, Math.min(editor.width, (event.clientX-r.left)*editor.width/r.width)),
+    y: Math.max(0, Math.min(editor.height, (event.clientY-r.top)*editor.height/r.height))
+  };
+}
+
+editor.addEventListener("pointerdown", event => {
+  if (!loaded || working) return;
+  event.preventDefault();
+  drawing = true;
+  editor.setPointerCapture(event.pointerId);
+  activeStroke = {
+    size: Number($("brushSize").value),
+    points: [point(event)]
+  };
+  strokes.push(activeStroke);
+  redrawMask();
+  render();
+  buttons();
+});
+
+editor.addEventListener("pointermove", event => {
+  if (!drawing || !activeStroke) return;
+  event.preventDefault();
+  activeStroke.points.push(point(event));
+  redrawMask();
+  render();
+});
+
+function stopDrawing() {
+  drawing = false;
+  activeStroke = null;
+}
+editor.addEventListener("pointerup", stopDrawing);
+editor.addEventListener("pointercancel", stopDrawing);
+editor.addEventListener("lostpointercapture", stopDrawing);
+
+$("brushSize").addEventListener("input", () => {
+  $("brushLabel").textContent = $("brushSize").value + " px";
+});
+
+$("undoButton").addEventListener("click", () => {
+  if (working) return;
+  strokes.pop();
+  redrawMask();
+  render();
+  buttons();
+  say("Last brush stroke undone.");
+});
+
+$("clearButton").addEventListener("click", () => {
+  if (working) return;
+  strokes = [];
+  redrawMask();
+  render();
+  buttons();
+  say("Selection cleared. Paint over the object again.");
+});
+
+$("newButton").addEventListener("click", () => {
+  if (working) return;
+  loaded = false;
+  strokes = [];
+  imageData = "";
+  editor.hidden = true;
+  $("emptyState").hidden = false;
+  $("resultPanel").style.display = "none";
+  fileInput.value = "";
+  buttons();
+  say("Choose a photo to begin.");
+  fileInput.click();
+});
+
+$("startButton").addEventListener("click", async () => {
+  if (!loaded || working || strokes.length === 0) return;
+
+  if (API_URL.includes("YOUR-PROJECT")) {
+    say("Set API_URL to your actual Vercel project address first.", "error");
+    return;
+  }
+
+  working = true;
+  buttons();
+  $("startButton").textContent = "AI CLEANING…";
+  say("Sending your photo to the AI. Please wait…");
+
+  try {
+    redrawMask();
+    const maskData = mask.toDataURL("image/png");
+
+    if (imageData.length + maskData.length > 3900000) {
+      throw new Error("Image too large. Try a smaller photo.");
+    }
+
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({imageData, maskData})
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "AI cleaning failed.");
+    if (!result.imageData) throw new Error("The AI returned no image.");
+
+    const cleaned = new Image();
+    await new Promise((resolve, reject) => {
+      cleaned.onload = resolve;
+      cleaned.onerror = () => reject(new Error("Could not display the result."));
+      cleaned.src = result.imageData;
+    });
+
+    $("beforeCanvas").width = source.width;
+    $("beforeCanvas").height = source.height;
+    $("beforeCanvas").getContext("2d").drawImage(source, 0, 0);
+    $("resultImage").src = result.imageData;
+    $("downloadButton").href = result.imageData;
+    $("resultPanel").style.display = "block";
+    say("Finished! Your cleaned photo is ready.", "success");
+    $("resultPanel").scrollIntoView({behavior:"smooth"});
+  } catch (error) {
+    console.error("PhotoCuh:", error);
+    say(error.message || "Could not connect to the AI. Check your Vercel backend.", "error");
+  } finally {
+    working = false;
+    $("startButton").textContent = "✦ START CLEANING";
+    buttons();
+  }
+});
+
+buttons();
 })();
 </script>
 </body>
