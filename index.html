@@ -3,346 +3,652 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PhotoCuh - Photo Cleaner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080808">
+<title>PhotoCuh — Clean Your Photos</title>
 
 <style>
-* {
-  box-sizing: border-box;
+:root {
+  --black: #080808;
+  --panel: #f5f5f5;
+  --border: #e5e5e5;
+  --muted: #777;
+  --accent: #ffdf00;
 }
+
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background: #fff;
-  color: #111;
-  font-family: Arial, sans-serif;
+  background: white;
+  color: var(--black);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+               Arial, sans-serif;
 }
 
 header {
-  background: #050505;
+  background: var(--black);
   color: white;
-  padding: 17px 20px;
-  font-size: 25px;
-  font-weight: 900;
-  letter-spacing: -1px;
+  padding: 17px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 950;
+  letter-spacing: -1.5px;
+}
+
+.logo span { color: var(--accent); }
+
+.header-tag {
+  font-size: 11px;
+  color: #aaa;
+  border: 1px solid #333;
+  padding: 6px 9px;
+  border-radius: 20px;
 }
 
 main {
-  width: 100%;
-  max-width: 650px;
+  max-width: 760px;
   margin: auto;
-  padding: 25px 16px 40px;
+  padding: 22px 15px 45px;
 }
 
-.import-area {
-  display: flex;
-  justify-content: center;
-  margin: 35px 0 25px;
-}
+.intro { margin-bottom: 22px; }
 
-.import-button {
-  background: #666;
-  color: white;
-  border: 2px solid #444;
-  border-radius: 30px;
-  padding: 28px 35px;
-  font-size: 25px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 5px 0 #333;
-}
-
-h2 {
-  font-size: 20px;
-  margin-top: 28px;
+h1 {
+  font-size: 27px;
+  letter-spacing: -1px;
+  margin: 0 0 7px;
 }
 
 p {
-  color: #666;
-  line-height: 1.5;
+  color: var(--muted);
   font-size: 14px;
+  line-height: 1.55;
+  margin: 0;
 }
 
-#editor {
-  display: none;
-}
-
-.canvas-wrap {
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-  border-radius: 12px;
-  background: #eee;
-  border: 1px solid #ddd;
-  touch-action: none;
-}
-
-canvas {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.tools {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  margin: 16px 0;
-}
-
-.tools label {
-  font-size: 14px;
-  font-weight: bold;
-}
-
-input[type="range"] {
-  width: 120px;
-  accent-color: #111;
-}
-
-.action {
-  width: 100%;
-  border: 0;
-  padding: 16px;
-  border-radius: 12px;
+.section-title {
   font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 10px;
+  font-weight: 800;
+  margin: 0 0 12px;
 }
 
-.start {
-  background: #111;
+.card {
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  padding: 14px;
+  margin-bottom: 18px;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.compare-label {
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 1px;
+  margin-bottom: 9px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.compare-label span {
+  color: var(--muted);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.compare-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  background: #f1f1f1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.compare-image canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.empty {
+  text-align: center;
+  padding: 8px;
+  color: #999;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.pill {
+  background: #f1f1f1;
+  color: #555;
+  font-size: 10px;
+  font-weight: 750;
+  border-radius: 20px;
+  padding: 5px 7px;
+}
+
+.pill.ready {
+  background: #e4f8e9;
+  color: #167536;
+}
+
+.import-box {
+  border: 2px dashed #d4d4d4;
+  border-radius: 17px;
+  padding: 27px 16px;
+  text-align: center;
+  background: #fafafa;
+}
+
+.upload-icon {
+  font-size: 35px;
+  margin-bottom: 10px;
+}
+
+.import-box h2 {
+  font-size: 18px;
+  margin: 0 0 7px;
+}
+
+.import-box p {
+  margin-bottom: 16px;
+}
+
+.button {
+  border: 0;
+  border-radius: 11px;
+  min-height: 45px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-family: inherit;
+}
+
+.button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: var(--black);
   color: white;
 }
 
+.primary:active { background: #333; }
+
+.yellow {
+  background: var(--accent);
+  color: black;
+}
+
 .secondary {
-  background: #eee;
+  background: #f0f0f0;
   color: #111;
 }
 
-#status {
-  text-align: center;
-  font-size: 14px;
-  margin-top: 14px;
-}
+.full { width: 100%; }
 
-.results {
-  display: none;
-  grid-template-columns: 1fr 1fr;
+#fileInput { display: none; }
+
+#editor { display: none; }
+
+.editor-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 10px;
-  margin-top: 25px;
+  margin-bottom: 12px;
 }
 
-.result-card {
-  min-width: 0;
+.editor-top h2 {
+  font-size: 16px;
+  margin: 0;
 }
 
-.result-card strong {
-  display: block;
-  font-size: 12px;
-  margin-bottom: 8px;
-  letter-spacing: 1px;
+.editor-top span {
+  color: var(--muted);
+  font-size: 11px;
 }
 
-.result-card canvas {
+.canvas-frame {
+  position: relative;
   width: 100%;
-  border-radius: 9px;
-  border: 1px solid #ddd;
+  overflow: hidden;
+  background:
+    linear-gradient(45deg,#eee 25%,transparent 25%),
+    linear-gradient(-45deg,#eee 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,#eee 75%),
+    linear-gradient(-45deg,transparent 75%,#eee 75%);
+  background-size: 18px 18px;
+  background-position: 0 0,0 9px,9px -9px,-9px 0;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+  touch-action: none;
+  line-height: 0;
 }
+
+#photoCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: none;
+}
+
+#brushCursor {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px #111, 0 1px 5px #0008;
+  border-radius: 50%;
+  pointer-events: none;
+  display: none;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+
+#brushCursor::after {
+  content: "";
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: white;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.controls {
+  margin-top: 16px;
+  display: grid;
+  gap: 16px;
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.control-row label {
+  font-size: 13px;
+  font-weight: 750;
+}
+
+#brushValue {
+  font-size: 12px;
+  color: #555;
+  font-weight: 700;
+  min-width: 48px;
+  text-align: right;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: #111;
+  cursor: pointer;
+}
+
+.brush-setting {
+  flex: 1;
+}
+
+.brush-setting input { display: block; }
+
+.button-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+
+.tip {
+  background: #fffbea;
+  border: 1px solid #f3e7a4;
+  color: #675a1b;
+  border-radius: 10px;
+  padding: 11px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.status {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #555;
+  margin-top: 11px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.status.error { color: #c02727; }
 
 footer {
+  border-top: 1px solid #eee;
   text-align: center;
-  padding: 25px 10px;
-  font-size: 12px;
-  color: #888;
+  color: #999;
+  font-size: 11px;
+  padding: 20px 10px;
+}
+
+@media (min-width: 600px) {
+  main { padding-top: 30px; }
+
+  .compare-image { aspect-ratio: 4 / 3; }
+
+  .card { padding: 18px; }
 }
 
 @media (max-width: 360px) {
-  .import-button {
-    padding: 23px 25px;
-    font-size: 22px;
-  }
-
-  main {
-    padding-left: 12px;
-    padding-right: 12px;
-  }
+  main { padding-left: 10px; padding-right: 10px; }
+  .card { padding: 10px; }
+  .comparison-grid { gap: 7px; }
+  h1 { font-size: 24px; }
 }
 </style>
 </head>
 
 <body>
-
-<header>PhotoCuh</header>
+<header>
+  <div class="logo">Photo<span>Cuh</span></div>
+  <div class="header-tag">PHOTO CLEANER</div>
+</header>
 
 <main>
+  <section class="intro">
+    <h1>Clean your photos.</h1>
+    <p>Brush over anything you want gone. PhotoCuh fills in the selected area and lets you compare your results.</p>
+  </section>
 
-  <div class="import-area" id="importArea">
-    <label class="import-button">
-      Import Photo
-      <input
-        type="file"
-        id="fileInput"
-        accept="image/*"
-        hidden
-      >
-    </label>
-  </div>
-
-  <section id="editor">
-    <h2>Paint what you want to remove</h2>
-    <p>
-      Use your finger to paint over unwanted objects.
-      The red area shows what you selected.
-    </p>
-
-    <div class="canvas-wrap">
-      <canvas id="photoCanvas"></canvas>
+  <!-- COMPARISON ALWAYS APPEARS ABOVE THE EDITOR -->
+  <section class="card" id="comparison">
+    <div class="editor-top">
+      <h2>Before &amp; After</h2>
+      <span id="compareStatus">Your results appear here</span>
     </div>
 
-    <div class="tools">
-      <label for="brushSize">Brush size</label>
-      <input
-        type="range"
-        id="brushSize"
-        min="5"
-        max="80"
-        value="25"
-      >
-      <span id="brushLabel">25 px</span>
-    </div>
-
-    <button class="action secondary" id="undoButton">
-      Undo Selection
-    </button>
-
-    <button class="action secondary" id="clearButton">
-      Clear Brush
-    </button>
-
-    <button class="action start" id="startButton">
-      START
-    </button>
-
-    <div id="status" role="status"></div>
-
-    <div class="results" id="results">
-      <div class="result-card">
-        <strong>BEFORE</strong>
-        <canvas id="beforeCanvas"></canvas>
+    <div class="comparison-grid">
+      <div>
+        <div class="compare-label">
+          BEFORE <span>Original</span>
+        </div>
+        <div class="compare-image">
+          <div class="empty" id="beforeEmpty">
+            Your original photo will appear here.
+          </div>
+          <canvas id="beforeCanvas" hidden></canvas>
+        </div>
       </div>
 
-      <div class="result-card">
-        <strong>AFTER</strong>
-        <canvas id="afterCanvas"></canvas>
+      <div>
+        <div class="compare-label">
+          AFTER <span class="pill" id="afterPill">Not ready</span>
+        </div>
+        <div class="compare-image">
+          <div class="empty" id="afterEmpty">
+            Your cleaned photo will appear here.
+          </div>
+          <canvas id="afterCanvas" hidden></canvas>
+        </div>
       </div>
-
-      <button class="action start" id="downloadButton"
-        style="grid-column: 1 / -1">
-        Download Edited Photo
-      </button>
     </div>
 
-    <button class="action secondary" id="newPhotoButton">
-      Import Another Photo
+    <button class="button primary full"
+      id="downloadButton" style="margin-top:14px" disabled>
+      ↓ Download cleaned photo
     </button>
   </section>
 
+  <section id="uploadSection" class="import-box">
+    <div class="upload-icon">▧</div>
+    <h2>Import a photo</h2>
+    <p>Choose a picture from your phone to get started.</p>
+    <label for="fileInput" class="button primary">
+      ↑ Choose photo
+    </label>
+  </section>
+
+  <input type="file" id="fileInput" accept="image/*">
+
+  <section id="editor">
+    <div class="editor-top" style="margin-top:25px">
+      <h2>01 — Mark what to remove</h2>
+      <span>Use your finger</span>
+    </div>
+
+    <div class="canvas-frame" id="canvasFrame">
+      <canvas id="photoCanvas"></canvas>
+      <div id="brushCursor"></div>
+    </div>
+
+    <div class="controls">
+      <div class="control-row">
+        <label for="brushSize">Brush size</label>
+        <div class="brush-setting">
+          <input type="range" id="brushSize"
+            min="5" max="150" value="35">
+        </div>
+        <span id="brushValue">35 px</span>
+      </div>
+
+      <div class="button-row">
+        <button class="button secondary" id="undoButton">
+          ↶ Undo stroke
+        </button>
+        <button class="button secondary" id="clearButton">
+          Clear selection
+        </button>
+      </div>
+
+      <div class="tip">
+        Tip: use a brush slightly larger than the object.
+        Cover its edges too, but avoid marking parts of the
+        photo you want to keep.
+      </div>
+
+      <button class="button yellow full" id="startButton">
+        ✦ START CLEANING
+      </button>
+
+      <div class="status" id="status" role="status" aria-live="polite">
+        Import a photo to begin.
+      </div>
+
+      <button class="button secondary full" id="newPhotoButton">
+        Import another photo
+      </button>
+    </div>
+  </section>
 </main>
 
-<footer>PhotoCuh · Simple photo cleanup</footer>
+<footer>PhotoCuh · Your photos, cleaned up.</footer>
 
+<!-- OpenCV provides a real image-inpainting algorithm. -->
 <script>
-const fileInput = document.getElementById("fileInput");
-const importArea = document.getElementById("importArea");
-const editor = document.getElementById("editor");
-const canvas = document.getElementById("photoCanvas");
-const ctx = canvas.getContext("2d", {
-  willReadFrequently: true
-});
+const OPENCV_URL =
+  "https://docs.opencv.org/4.x/opencv.js";
 
-const brushSize = document.getElementById("brushSize");
-const brushLabel = document.getElementById("brushLabel");
-const status = document.getElementById("status");
-const results = document.getElementById("results");
+let cvReady = false;
+let cvFailed = false;
 
-const beforeCanvas = document.getElementById("beforeCanvas");
-const afterCanvas = document.getElementById("afterCanvas");
+const cvScript = document.createElement("script");
+cvScript.src = OPENCV_URL;
+cvScript.async = true;
+
+cvScript.onload = () => {
+  if (typeof cv !== "undefined") {
+    if (cv.Mat) {
+      cvReady = true;
+    } else {
+      cv.onRuntimeInitialized = () => {
+        cvReady = true;
+      };
+    }
+  } else {
+    cvFailed = true;
+  }
+};
+
+cvScript.onerror = () => {
+  cvFailed = true;
+};
+
+document.head.appendChild(cvScript);
+
+const $ = id => document.getElementById(id);
+
+const fileInput = $("fileInput");
+const uploadSection = $("uploadSection");
+const editor = $("editor");
+const canvas = $("photoCanvas");
+const ctx = canvas.getContext("2d");
+
+const mask = document.createElement("canvas");
+const maskCtx = mask.getContext("2d");
+
+const beforeCanvas = $("beforeCanvas");
+const afterCanvas = $("afterCanvas");
+const brushCursor = $("brushCursor");
+const canvasFrame = $("canvasFrame");
 
 let originalImage = null;
-let maskCanvas = document.createElement("canvas");
-let maskCtx = maskCanvas.getContext("2d");
+let editedCanvas = null;
 let drawing = false;
-let hasSelection = false;
 let lastPoint = null;
+let hasSelection = false;
 let undoStack = [];
-let editedImage = null;
+let activePointer = null;
+let working = false;
 
-const MAX_SIZE = 1200;
+const MAX_SIDE = 1400;
+const MAX_PIXELS = 1400000;
 
-fileInput.addEventListener("change", function() {
+function say(message, error = false) {
+  $("status").textContent = message;
+  $("status").classList.toggle("error", error);
+}
+
+function copyCanvas(from, to) {
+  to.width = from.width;
+  to.height = from.height;
+  to.getContext("2d").drawImage(from, 0, 0);
+}
+
+function updateComparison(original, cleaned = null) {
+  if (original) {
+    copyCanvas(original, beforeCanvas);
+    beforeCanvas.hidden = false;
+    $("beforeEmpty").hidden = true;
+  }
+
+  if (cleaned) {
+    copyCanvas(cleaned, afterCanvas);
+    afterCanvas.hidden = false;
+    $("afterEmpty").hidden = true;
+    $("afterPill").textContent = "Ready";
+    $("afterPill").classList.add("ready");
+    $("compareStatus").textContent = "Compare your result";
+    $("downloadButton").disabled = false;
+  } else {
+    afterCanvas.hidden = true;
+    $("afterEmpty").hidden = false;
+    $("afterPill").textContent = "Not ready";
+    $("afterPill").classList.remove("ready");
+    $("compareStatus").textContent = "Your results appear here";
+    $("downloadButton").disabled = true;
+  }
+}
+
+function resetResults() {
+  editedCanvas = null;
+  updateComparison(null);
+}
+
+fileInput.addEventListener("change", () => {
   const file = fileInput.files[0];
-
   if (!file) return;
 
   if (!file.type.startsWith("image/")) {
-    status.textContent = "Please select an image file.";
+    say("Please choose a valid image.", true);
+    return;
+  }
+
+  if (file.size > 20 * 1024 * 1024) {
+    say("Please choose an image smaller than 20 MB.", true);
     return;
   }
 
   const reader = new FileReader();
 
-  reader.onload = function(event) {
-    const image = new Image();
+  reader.onerror = () => say("Could not read this file.", true);
 
-    image.onload = function() {
-      originalImage = image;
+  reader.onload = () => {
+    const img = new Image();
 
+    img.onerror = () => say("This image could not be opened.", true);
+
+    img.onload = () => {
       const scale = Math.min(
         1,
-        MAX_SIZE / Math.max(image.width, image.height)
+        MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight),
+        Math.sqrt(MAX_PIXELS /
+          (img.naturalWidth * img.naturalHeight))
       );
 
-      canvas.width = Math.round(image.width * scale);
-      canvas.height = Math.round(image.height * scale);
+      canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
 
-      maskCanvas.width = canvas.width;
-      maskCanvas.height = canvas.height;
+      mask.width = canvas.width;
+      mask.height = canvas.height;
 
-      maskCtx.clearRect(
-        0, 0, maskCanvas.width, maskCanvas.height
-      );
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      maskCtx.clearRect(0, 0, mask.width, mask.height);
 
-      ctx.drawImage(
-        image, 0, 0, canvas.width, canvas.height
-      );
+      originalImage = document.createElement("canvas");
+      copyCanvas(canvas, originalImage);
 
       undoStack = [];
       hasSelection = false;
-      editedImage = null;
+      drawing = false;
+      resetResults();
+      updateComparison(originalImage);
 
-      results.style.display = "none";
+      uploadSection.style.display = "none";
       editor.style.display = "block";
-      importArea.style.display = "none";
-      status.textContent = "Photo imported! Paint an area to remove.";
 
+      say(cvReady
+        ? "Ready! Paint over an object to remove it."
+        : "Photo loaded. Preparing the cleanup engine…");
+
+      updateBrushCursor();
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    image.onerror = function() {
-      status.textContent = "Could not open this image.";
-    };
-
-    image.src = event.target.result;
+    img.src = reader.result;
   };
 
   reader.readAsDataURL(file);
-});
-
-brushSize.addEventListener("input", function() {
-  brushLabel.textContent = brushSize.value + " px";
 });
 
 function getPoint(event) {
@@ -354,238 +660,294 @@ function getPoint(event) {
   };
 }
 
-function paintLine(from, to) {
-  const size = Number(brushSize.value);
+function saveUndo() {
+  undoStack.push(maskCtx.getImageData(
+    0, 0, mask.width, mask.height
+  ));
+
+  if (undoStack.length > 15) undoStack.shift();
+}
+
+function drawStroke(a, b) {
+  const radius = Number($("brushSize").value) / 2;
 
   maskCtx.save();
   maskCtx.strokeStyle = "white";
   maskCtx.fillStyle = "white";
-  maskCtx.lineWidth = size;
+  maskCtx.lineWidth = radius * 2;
   maskCtx.lineCap = "round";
   maskCtx.lineJoin = "round";
 
   maskCtx.beginPath();
-  maskCtx.moveTo(from.x, from.y);
-  maskCtx.lineTo(to.x, to.y);
+  maskCtx.moveTo(a.x, a.y);
+  maskCtx.lineTo(b.x, b.y);
   maskCtx.stroke();
 
   maskCtx.beginPath();
-  maskCtx.arc(to.x, to.y, size / 2, 0, Math.PI * 2);
+  maskCtx.arc(b.x, b.y, radius, 0, Math.PI * 2);
   maskCtx.fill();
-
   maskCtx.restore();
+
   hasSelection = true;
-  showMask();
+  renderSelection();
 }
 
-function showMask() {
-  ctx.drawImage(originalImage, 0, 0,
-    canvas.width, canvas.height);
-
-  const overlay = document.createElement("canvas");
-  overlay.width = canvas.width;
-  overlay.height = canvas.height;
-
-  const overlayCtx = overlay.getContext("2d");
-  overlayCtx.drawImage(maskCanvas, 0, 0);
-  overlayCtx.globalCompositeOperation = "source-in";
-  overlayCtx.fillStyle = "rgba(255, 40, 40, 0.65)";
-  overlayCtx.fillRect(0, 0, overlay.width, overlay.height);
-
-  ctx.drawImage(overlay, 0, 0);
-}
-
-canvas.addEventListener("pointerdown", function(event) {
+function renderSelection() {
   if (!originalImage) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(originalImage, 0, 0);
+
+  const pixels = maskCtx.getImageData(
+    0, 0, mask.width, mask.height
+  );
+
+  const overlay = ctx.createImageData(canvas.width, canvas.height);
+
+  for (let i = 0; i < pixels.data.length; i += 4) {
+    if (pixels.data[i + 3] > 0) {
+      overlay.data[i] = 255;
+      overlay.data[i + 1] = 45;
+      overlay.data[i + 2] = 55;
+      overlay.data[i + 3] = Math.min(
+        165, pixels.data[i + 3]
+      );
+    }
+  }
+
+  ctx.putImageData(overlay, 0, 0);
+}
+
+canvas.addEventListener("pointerdown", event => {
+  if (!originalImage || working) return;
 
   event.preventDefault();
   canvas.setPointerCapture(event.pointerId);
+  activePointer = event.pointerId;
 
-  undoStack.push(maskCtx.getImageData(
-    0, 0, maskCanvas.width, maskCanvas.height
-  ));
-
-  if (undoStack.length > 10) undoStack.shift();
-
+  saveUndo();
   drawing = true;
   lastPoint = getPoint(event);
-  paintLine(lastPoint, lastPoint);
+
+  drawStroke(lastPoint, lastPoint);
 });
 
-canvas.addEventListener("pointermove", function(event) {
-  if (!drawing) return;
+canvas.addEventListener("pointermove", event => {
+  if (event.pointerType === "mouse" && !drawing) {
+    showBrushCursor(event);
+  }
+
+  if (!drawing || event.pointerId !== activePointer) return;
 
   event.preventDefault();
 
   const point = getPoint(event);
-  paintLine(lastPoint, point);
+  drawStroke(lastPoint, point);
   lastPoint = point;
 });
 
 function stopDrawing() {
   drawing = false;
   lastPoint = null;
+  activePointer = null;
 }
 
 canvas.addEventListener("pointerup", stopDrawing);
 canvas.addEventListener("pointercancel", stopDrawing);
+canvas.addEventListener("lostpointercapture", stopDrawing);
 
-document.getElementById("undoButton").onclick = function() {
-  if (!undoStack.length) return;
+function showBrushCursor(event) {
+  const frame = canvasFrame.getBoundingClientRect();
+  const rect = canvas.getBoundingClientRect();
+
+  const size = Number($("brushSize").value);
+  const visualSize = size * rect.width / canvas.width;
+
+  brushCursor.style.width = visualSize + "px";
+  brushCursor.style.height = visualSize + "px";
+  brushCursor.style.left =
+    (event.clientX - frame.left) + "px";
+  brushCursor.style.top =
+    (event.clientY - frame.top) + "px";
+  brushCursor.style.display = "block";
+}
+
+canvas.addEventListener("pointerenter", event => {
+  if (event.pointerType === "mouse") showBrushCursor(event);
+});
+
+canvas.addEventListener("pointerleave", () => {
+  if (!drawing) brushCursor.style.display = "none";
+});
+
+function updateBrushCursor() {
+  const size = Number($("brushSize").value);
+  $("brushValue").textContent = size + " px";
+
+  const rect = canvas.getBoundingClientRect();
+  const displaySize = rect.width
+    ? size * rect.width / canvas.width
+    : size;
+
+  brushCursor.style.width = displaySize + "px";
+  brushCursor.style.height = displaySize + "px";
+}
+
+$("brushSize").addEventListener("input", updateBrushCursor);
+window.addEventListener("resize", updateBrushCursor);
+
+$("undoButton").onclick = () => {
+  if (!undoStack.length || working) return;
 
   maskCtx.putImageData(undoStack.pop(), 0, 0);
 
-  hasSelection = maskCtx.getImageData(
-    0, 0, maskCanvas.width, maskCanvas.height
-  ).data.some((value, index) =>
-    index % 4 === 3 && value > 0
-  );
+  const data = maskCtx.getImageData(
+    0, 0, mask.width, mask.height
+  ).data;
 
-  showMask();
+  hasSelection = false;
+
+  for (let i = 3; i < data.length; i += 4) {
+    if (data[i] > 0) {
+      hasSelection = true;
+      break;
+    }
+  }
+
+  renderSelection();
+  resetResults();
+  say("Last stroke undone.");
 };
 
-document.getElementById("clearButton").onclick = function() {
-  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+$("clearButton").onclick = () => {
+  if (working) return;
+
+  maskCtx.clearRect(0, 0, mask.width, mask.height);
   undoStack = [];
   hasSelection = false;
-  results.style.display = "none";
-  showMask();
-  status.textContent = "Selection cleared.";
+  renderSelection();
+  resetResults();
+  say("Selection cleared.");
 };
 
 /*
-  Basic offline fill:
-  This spreads colors from nearby unselected pixels.
-  It is only an approximation, not AI object removal.
+  OpenCV Telea inpainting:
+  Uses nearby image structure to fill the masked area.
+  This is classical inpainting, not generative AI.
 */
 
-function basicCleanup(source, mask) {
-  const w = source.width;
-  const h = source.height;
-
-  const srcCtx = source.getContext("2d", {
-    willReadFrequently: true
-  });
-
-  const original = srcCtx.getImageData(0, 0, w, h);
-  const maskData = mask.getContext("2d", {
-    willReadFrequently: true
-  }).getImageData(0, 0, w, h).data;
-
-  let pixels = new Uint8ClampedArray(original.data);
-  let filled = new Uint8Array(w * h);
-
-  for (let i = 0; i < w * h; i++) {
-    filled[i] = maskData[i * 4 + 3] > 20 ? 0 : 1;
+function runInpainting() {
+  if (!cvReady || typeof cv === "undefined" || !cv.Mat) {
+    throw new Error("ENGINE_NOT_READY");
   }
 
-  const maxIterations = Math.min(120, w + h);
+  const src = cv.imread(originalImage);
+  const maskMat = new cv.Mat(
+    mask.height, mask.width, cv.CV_8UC1
+  );
 
-  for (let iteration = 0; iteration < maxIterations; iteration++) {
-    let next = new Uint8ClampedArray(pixels);
-    let nextFilled = new Uint8Array(filled);
-    let changed = false;
+  const result = new cv.Mat();
+  const rgba = new cv.Mat();
 
-    for (let y = 1; y < h - 1; y++) {
-      for (let x = 1; x < w - 1; x++) {
-        const p = y * w + x;
+  try {
+    const maskData = maskCtx.getImageData(
+      0, 0, mask.width, mask.height
+    ).data;
 
-        if (filled[p]) continue;
-
-        let r = 0, g = 0, b = 0, count = 0;
-
-        const neighbors = [
-          p - 1, p + 1, p - w, p + w,
-          p - w - 1, p - w + 1,
-          p + w - 1, p + w + 1
-        ];
-
-        for (const n of neighbors) {
-          if (filled[n]) {
-            r += pixels[n * 4];
-            g += pixels[n * 4 + 1];
-            b += pixels[n * 4 + 2];
-            count++;
-          }
-        }
-
-        if (count > 0) {
-          next[p * 4] = r / count;
-          next[p * 4 + 1] = g / count;
-          next[p * 4 + 2] = b / count;
-          next[p * 4 + 3] = 255;
-          nextFilled[p] = 1;
-          changed = true;
-        }
-      }
+    for (let i = 0; i < maskData.length; i += 4) {
+      maskMat.data[i / 4] = maskData[i + 3] > 20 ? 255 : 0;
     }
 
-    pixels = next;
-    filled = nextFilled;
+    // Slightly expand the mask to cover object edges.
+    const kernel = cv.Mat.ones(5, 5, cv.CV_8U);
 
-    if (!changed) break;
+    try {
+      cv.dilate(
+        maskMat, maskMat, kernel,
+        new cv.Point(-1, -1), 1
+      );
+    } finally {
+      kernel.delete();
+    }
+
+    // Use Telea's algorithm for traditional image inpainting.
+    cv.inpaint(src, maskMat, result, 5, cv.INPAINT_TELEA);
+
+    cv.cvtColor(result, rgba, cv.COLOR_RGB2RGBA);
+
+    const output = document.createElement("canvas");
+    output.width = canvas.width;
+    output.height = canvas.height;
+
+    const outputCtx = output.getContext("2d");
+    const imageData = outputCtx.createImageData(
+      output.width, output.height
+    );
+
+    // OpenCV's RGBA output is copied into the canvas.
+    imageData.data.set(rgba.data);
+    outputCtx.putImageData(imageData, 0, 0);
+
+    return output;
+  } finally {
+    src.delete();
+    maskMat.delete();
+    result.delete();
+    rgba.delete();
   }
-
-  const output = document.createElement("canvas");
-  output.width = w;
-  output.height = h;
-
-  const outCtx = output.getContext("2d");
-  const imageData = outCtx.createImageData(w, h);
-
-  imageData.data.set(pixels);
-  outCtx.putImageData(imageData, 0, 0);
-
-  return output;
 }
 
-document.getElementById("startButton").onclick = function() {
-  if (!originalImage) return;
+$("startButton").onclick = async () => {
+  if (!originalImage || working) return;
 
   if (!hasSelection) {
-    status.textContent = "Paint over something first!";
+    say("Paint over something you want to remove first.", true);
     return;
   }
 
-  status.textContent = "Cleaning selected area...";
-  results.style.display = "none";
+  if (!cvReady) {
+    say(cvFailed
+      ? "Cleanup engine failed to load. Check your internet connection and reload."
+      : "Cleanup engine is loading. Please try again in a moment.");
+    return;
+  }
 
-  setTimeout(function() {
-    try {
-      const source = document.createElement("canvas");
-      source.width = canvas.width;
-      source.height = canvas.height;
+  working = true;
+  $("startButton").disabled = true;
+  $("startButton").textContent = "CLEANING…";
+  say("Removing the selected area…");
 
-      source.getContext("2d").drawImage(
-        originalImage, 0, 0,
-        canvas.width, canvas.height
-      );
+  try {
+    // Let the browser update the loading message first.
+    await new Promise(resolve => setTimeout(resolve, 40));
 
-      beforeCanvas.width = canvas.width;
-      beforeCanvas.height = canvas.height;
-      beforeCanvas.getContext("2d").drawImage(source, 0, 0);
+    editedCanvas = runInpainting();
 
-      editedImage = basicCleanup(source, maskCanvas);
+    updateComparison(originalImage, editedCanvas);
 
-      afterCanvas.width = editedImage.width;
-      afterCanvas.height = editedImage.height;
-      afterCanvas.getContext("2d").drawImage(editedImage, 0, 0);
+    // Restore the original photo and remove the red selection.
+    ctx.drawImage(originalImage, 0, 0);
 
-      results.style.display = "grid";
-      status.textContent =
-        "Done! Compare the before and after images below.";
-    } catch (error) {
-      status.textContent = "Something went wrong. Try a smaller photo.";
-    }
-  }, 50);
+    say("Finished! Your before and after images are above.");
+  } catch (error) {
+    console.error(error);
+
+    say(error.message === "ENGINE_NOT_READY"
+      ? "Cleanup engine is still loading. Try again shortly."
+      : "Cleanup failed. Try a smaller image or reload the page.", true);
+  } finally {
+    working = false;
+    $("startButton").disabled = false;
+    $("startButton").textContent = "✦ START CLEANING";
+  }
 };
 
-document.getElementById("downloadButton").onclick = function() {
-  if (!editedImage) return;
+$("downloadButton").onclick = () => {
+  if (!editedCanvas) return;
 
-  editedImage.toBlob(function(blob) {
+  editedCanvas.toBlob(blob => {
     if (!blob) {
-      status.textContent = "Could not export this image.";
+      say("Could not export your image.", true);
       return;
     }
 
@@ -594,22 +956,43 @@ document.getElementById("downloadButton").onclick = function() {
 
     link.href = url;
     link.download = "photocuh-cleaned.png";
+    document.body.appendChild(link);
     link.click();
+    link.remove();
 
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
   }, "image/png");
 };
 
-document.getElementById("newPhotoButton").onclick = function() {
+$("newPhotoButton").onclick = () => {
   fileInput.value = "";
-  editor.style.display = "none";
-  importArea.style.display = "flex";
-  results.style.display = "none";
-  status.textContent = "";
   originalImage = null;
-  editedImage = null;
+  editedCanvas = null;
+  undoStack = [];
+  hasSelection = false;
+  drawing = false;
+
+  editor.style.display = "none";
+  uploadSection.style.display = "block";
+
+  beforeCanvas.hidden = true;
+  afterCanvas.hidden = true;
+  $("beforeEmpty").hidden = false;
+  $("afterEmpty").hidden = false;
+
+  $("beforeEmpty").textContent =
+    "Your original photo will appear here.";
+  $("afterEmpty").textContent =
+    "Your cleaned photo will appear here.";
+
+  $("afterPill").textContent = "Not ready";
+  $("afterPill").classList.remove("ready");
+  $("compareStatus").textContent = "Your results appear here";
+  $("downloadButton").disabled = true;
+
+  say("Import a photo to begin.");
+  window.scrollTo({ top: 0, behavior: "smooth" });
 };
 </script>
-
 </body>
 </html>
