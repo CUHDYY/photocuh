@@ -421,59 +421,83 @@ $("clearButton").onclick=()=>{
   Traditional inpainting. The selected mask is expanded to include
   object edges. RGB conversion is explicit to avoid channel errors.
 */
-function runInpainting() {
-  if(!cvReady||typeof cv==="undefined"||!cv.Mat)
-    throw new Error("ENGINE_NOT_READY");
+async function runAIInpainting() {
+  // Make a black background with white pixels where the brush selected.
+  const maskExport = document.createElement("canvas");
+  maskExport.width = mask.width;
+  maskExport.height = mask.height;
 
-  let src,rgb,maskMat,result,rgba,kernel;
-  try {
-    src=cv.imread(originalImage);
-    rgb=new cv.Mat();
-    cv.cvtColor(src,rgb,cv.COLOR_RGBA2RGB);
+  const exportCtx = maskExport.getContext("2d");
+  exportCtx.fillStyle = "#000";
+  exportCtx.fillRect(0, 0, maskExport.width, maskExport.height);
+  exportCtx.drawImage(mask, 0, 0);
 
-    const maskPixels=maskCtx.getImageData(
-      0,0,mask.width,mask.height
-    ).data;
+  // JPEG keeps the original photo request smaller.
+  const imageData = originalImage.toDataURL("image/jpeg", 0.82);
+  const maskData = maskExport.toDataURL("image/png");
 
-    maskMat=new cv.Mat(mask.height,mask.width,cv.CV_8UC1);
-    let marked=0;
+  const response = await fetch("/api/remove", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ imageData, maskData })
+  });
 
-    for(let i=0;i<maskPixels.length;i+=4) {
-      const selected=maskPixels[i+3]>20;
-      maskMat.data[i/4]=selected?255:0;
-      if(selected)marked++;
-    }
+  const result = await response.json();
 
-    if(marked===0)throw new Error("EMPTY_MASK");
-
-    // Expand selected area around object boundaries.
-    kernel=cv.Mat.ones(7,7,cv.CV_8U);
-    cv.dilate(maskMat,maskMat,kernel,new cv.Point(-1,-1),2);
-
-    result=new cv.Mat();
-    cv.inpaint(rgb,maskMat,result,8,cv.INPAINT_TELEA);
-
-    // Convert back to RGBA for drawing in a browser canvas.
-    rgba=new cv.Mat();
-    cv.cvtColor(result,rgba,cv.COLOR_RGB2RGBA);
-
-    const output=document.createElement("canvas");
-    output.width=canvas.width;
-    output.height=canvas.height;
-    const outCtx=output.getContext("2d");
-    const imageData=outCtx.createImageData(output.width,output.height);
-    imageData.data.set(rgba.data);
-    outCtx.putImageData(imageData,0,0);
-
-    return output;
-  } finally {
-    [src,rgb,maskMat,result,rgba,kernel].forEach(mat=>{
-      if(mat)mat.delete();
-    });
+  if (!response.ok) {
+    throw new Error(result.error || "AI cleaning failed.");
   }
+
+  if (!result.imageData) {
+    throw new Error("The AI did not return an image.");
+  }
+
+  const image = new Image();
+
+  await new Promise((resolve, reject) => {
+    image.onload = resolve;
+    image.onerror = () => reject(
+      new Error("Could not display the AI result.")
+    );
+    image.src = result.imageData;
+  });
+
+  const output = document.createElement("canvas");
+  output.width = image.naturalWidth;
+  output.height = image.naturalHeight;
+  output.getContext("2d").drawImage(image, 0, 0);
+
+  return output;
 }
 
-$("startButton").onclick=async()=>{
+$("startButton").onclick = async () => {
+  if (!originalImage || working) return;
+
+  if (!hasSelection) {
+    say("Paint over the object you want to remove first.", true);
+    return;
+  }
+
+  working = true;
+  $("startButton").disabled = true;
+  $("startButton").textContent = "AI CLEANING…";
+  say("Uploading your photo to the AI. This may take a little while…");
+
+  try {
+    editedCanvas = await runAIInpainting();
+    updateComparison(originalImage, editedCanvas);
+    renderSelection();
+    say("Finished! Check your AI-cleaned photo above.");
+  } catch (error) {
+    console.error("PhotoCuh cleaning error:", error);
+    say(error.message || "Cleaning failed. Please try again.", true);
+  } finally {
+    working = false;
+    $("startButton").disabled = false;
+    $("startButton").textContent = "✦ START CLEANING";
+  }
+};
+
   if(!originalImage||working)return;
   if(!hasSelection) {
     say("Paint over something you want to remove first.",true);
