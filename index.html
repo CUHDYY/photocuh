@@ -1,0 +1,615 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhotoCuh - Photo Cleaner</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #fff;
+  color: #111;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  background: #050505;
+  color: white;
+  padding: 17px 20px;
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: -1px;
+}
+
+main {
+  width: 100%;
+  max-width: 650px;
+  margin: auto;
+  padding: 25px 16px 40px;
+}
+
+.import-area {
+  display: flex;
+  justify-content: center;
+  margin: 35px 0 25px;
+}
+
+.import-button {
+  background: #666;
+  color: white;
+  border: 2px solid #444;
+  border-radius: 30px;
+  padding: 28px 35px;
+  font-size: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 5px 0 #333;
+}
+
+h2 {
+  font-size: 20px;
+  margin-top: 28px;
+}
+
+p {
+  color: #666;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+#editor {
+  display: none;
+}
+
+.canvas-wrap {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #eee;
+  border: 1px solid #ddd;
+  touch-action: none;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.tools label {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+input[type="range"] {
+  width: 120px;
+  accent-color: #111;
+}
+
+.action {
+  width: 100%;
+  border: 0;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.start {
+  background: #111;
+  color: white;
+}
+
+.secondary {
+  background: #eee;
+  color: #111;
+}
+
+#status {
+  text-align: center;
+  font-size: 14px;
+  margin-top: 14px;
+}
+
+.results {
+  display: none;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.result-card {
+  min-width: 0;
+}
+
+.result-card strong {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.result-card canvas {
+  width: 100%;
+  border-radius: 9px;
+  border: 1px solid #ddd;
+}
+
+footer {
+  text-align: center;
+  padding: 25px 10px;
+  font-size: 12px;
+  color: #888;
+}
+
+@media (max-width: 360px) {
+  .import-button {
+    padding: 23px 25px;
+    font-size: 22px;
+  }
+
+  main {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>PhotoCuh</header>
+
+<main>
+
+  <div class="import-area" id="importArea">
+    <label class="import-button">
+      Import Photo
+      <input
+        type="file"
+        id="fileInput"
+        accept="image/*"
+        hidden
+      >
+    </label>
+  </div>
+
+  <section id="editor">
+    <h2>Paint what you want to remove</h2>
+    <p>
+      Use your finger to paint over unwanted objects.
+      The red area shows what you selected.
+    </p>
+
+    <div class="canvas-wrap">
+      <canvas id="photoCanvas"></canvas>
+    </div>
+
+    <div class="tools">
+      <label for="brushSize">Brush size</label>
+      <input
+        type="range"
+        id="brushSize"
+        min="5"
+        max="80"
+        value="25"
+      >
+      <span id="brushLabel">25 px</span>
+    </div>
+
+    <button class="action secondary" id="undoButton">
+      Undo Selection
+    </button>
+
+    <button class="action secondary" id="clearButton">
+      Clear Brush
+    </button>
+
+    <button class="action start" id="startButton">
+      START
+    </button>
+
+    <div id="status" role="status"></div>
+
+    <div class="results" id="results">
+      <div class="result-card">
+        <strong>BEFORE</strong>
+        <canvas id="beforeCanvas"></canvas>
+      </div>
+
+      <div class="result-card">
+        <strong>AFTER</strong>
+        <canvas id="afterCanvas"></canvas>
+      </div>
+
+      <button class="action start" id="downloadButton"
+        style="grid-column: 1 / -1">
+        Download Edited Photo
+      </button>
+    </div>
+
+    <button class="action secondary" id="newPhotoButton">
+      Import Another Photo
+    </button>
+  </section>
+
+</main>
+
+<footer>PhotoCuh · Simple photo cleanup</footer>
+
+<script>
+const fileInput = document.getElementById("fileInput");
+const importArea = document.getElementById("importArea");
+const editor = document.getElementById("editor");
+const canvas = document.getElementById("photoCanvas");
+const ctx = canvas.getContext("2d", {
+  willReadFrequently: true
+});
+
+const brushSize = document.getElementById("brushSize");
+const brushLabel = document.getElementById("brushLabel");
+const status = document.getElementById("status");
+const results = document.getElementById("results");
+
+const beforeCanvas = document.getElementById("beforeCanvas");
+const afterCanvas = document.getElementById("afterCanvas");
+
+let originalImage = null;
+let maskCanvas = document.createElement("canvas");
+let maskCtx = maskCanvas.getContext("2d");
+let drawing = false;
+let hasSelection = false;
+let lastPoint = null;
+let undoStack = [];
+let editedImage = null;
+
+const MAX_SIZE = 1200;
+
+fileInput.addEventListener("change", function() {
+  const file = fileInput.files[0];
+
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    status.textContent = "Please select an image file.";
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = function(event) {
+    const image = new Image();
+
+    image.onload = function() {
+      originalImage = image;
+
+      const scale = Math.min(
+        1,
+        MAX_SIZE / Math.max(image.width, image.height)
+      );
+
+      canvas.width = Math.round(image.width * scale);
+      canvas.height = Math.round(image.height * scale);
+
+      maskCanvas.width = canvas.width;
+      maskCanvas.height = canvas.height;
+
+      maskCtx.clearRect(
+        0, 0, maskCanvas.width, maskCanvas.height
+      );
+
+      ctx.drawImage(
+        image, 0, 0, canvas.width, canvas.height
+      );
+
+      undoStack = [];
+      hasSelection = false;
+      editedImage = null;
+
+      results.style.display = "none";
+      editor.style.display = "block";
+      importArea.style.display = "none";
+      status.textContent = "Photo imported! Paint an area to remove.";
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    image.onerror = function() {
+      status.textContent = "Could not open this image.";
+    };
+
+    image.src = event.target.result;
+  };
+
+  reader.readAsDataURL(file);
+});
+
+brushSize.addEventListener("input", function() {
+  brushLabel.textContent = brushSize.value + " px";
+});
+
+function getPoint(event) {
+  const rect = canvas.getBoundingClientRect();
+
+  return {
+    x: (event.clientX - rect.left) * canvas.width / rect.width,
+    y: (event.clientY - rect.top) * canvas.height / rect.height
+  };
+}
+
+function paintLine(from, to) {
+  const size = Number(brushSize.value);
+
+  maskCtx.save();
+  maskCtx.strokeStyle = "white";
+  maskCtx.fillStyle = "white";
+  maskCtx.lineWidth = size;
+  maskCtx.lineCap = "round";
+  maskCtx.lineJoin = "round";
+
+  maskCtx.beginPath();
+  maskCtx.moveTo(from.x, from.y);
+  maskCtx.lineTo(to.x, to.y);
+  maskCtx.stroke();
+
+  maskCtx.beginPath();
+  maskCtx.arc(to.x, to.y, size / 2, 0, Math.PI * 2);
+  maskCtx.fill();
+
+  maskCtx.restore();
+  hasSelection = true;
+  showMask();
+}
+
+function showMask() {
+  ctx.drawImage(originalImage, 0, 0,
+    canvas.width, canvas.height);
+
+  const overlay = document.createElement("canvas");
+  overlay.width = canvas.width;
+  overlay.height = canvas.height;
+
+  const overlayCtx = overlay.getContext("2d");
+  overlayCtx.drawImage(maskCanvas, 0, 0);
+  overlayCtx.globalCompositeOperation = "source-in";
+  overlayCtx.fillStyle = "rgba(255, 40, 40, 0.65)";
+  overlayCtx.fillRect(0, 0, overlay.width, overlay.height);
+
+  ctx.drawImage(overlay, 0, 0);
+}
+
+canvas.addEventListener("pointerdown", function(event) {
+  if (!originalImage) return;
+
+  event.preventDefault();
+  canvas.setPointerCapture(event.pointerId);
+
+  undoStack.push(maskCtx.getImageData(
+    0, 0, maskCanvas.width, maskCanvas.height
+  ));
+
+  if (undoStack.length > 10) undoStack.shift();
+
+  drawing = true;
+  lastPoint = getPoint(event);
+  paintLine(lastPoint, lastPoint);
+});
+
+canvas.addEventListener("pointermove", function(event) {
+  if (!drawing) return;
+
+  event.preventDefault();
+
+  const point = getPoint(event);
+  paintLine(lastPoint, point);
+  lastPoint = point;
+});
+
+function stopDrawing() {
+  drawing = false;
+  lastPoint = null;
+}
+
+canvas.addEventListener("pointerup", stopDrawing);
+canvas.addEventListener("pointercancel", stopDrawing);
+
+document.getElementById("undoButton").onclick = function() {
+  if (!undoStack.length) return;
+
+  maskCtx.putImageData(undoStack.pop(), 0, 0);
+
+  hasSelection = maskCtx.getImageData(
+    0, 0, maskCanvas.width, maskCanvas.height
+  ).data.some((value, index) =>
+    index % 4 === 3 && value > 0
+  );
+
+  showMask();
+};
+
+document.getElementById("clearButton").onclick = function() {
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+  undoStack = [];
+  hasSelection = false;
+  results.style.display = "none";
+  showMask();
+  status.textContent = "Selection cleared.";
+};
+
+/*
+  Basic offline fill:
+  This spreads colors from nearby unselected pixels.
+  It is only an approximation, not AI object removal.
+*/
+
+function basicCleanup(source, mask) {
+  const w = source.width;
+  const h = source.height;
+
+  const srcCtx = source.getContext("2d", {
+    willReadFrequently: true
+  });
+
+  const original = srcCtx.getImageData(0, 0, w, h);
+  const maskData = mask.getContext("2d", {
+    willReadFrequently: true
+  }).getImageData(0, 0, w, h).data;
+
+  let pixels = new Uint8ClampedArray(original.data);
+  let filled = new Uint8Array(w * h);
+
+  for (let i = 0; i < w * h; i++) {
+    filled[i] = maskData[i * 4 + 3] > 20 ? 0 : 1;
+  }
+
+  const maxIterations = Math.min(120, w + h);
+
+  for (let iteration = 0; iteration < maxIterations; iteration++) {
+    let next = new Uint8ClampedArray(pixels);
+    let nextFilled = new Uint8Array(filled);
+    let changed = false;
+
+    for (let y = 1; y < h - 1; y++) {
+      for (let x = 1; x < w - 1; x++) {
+        const p = y * w + x;
+
+        if (filled[p]) continue;
+
+        let r = 0, g = 0, b = 0, count = 0;
+
+        const neighbors = [
+          p - 1, p + 1, p - w, p + w,
+          p - w - 1, p - w + 1,
+          p + w - 1, p + w + 1
+        ];
+
+        for (const n of neighbors) {
+          if (filled[n]) {
+            r += pixels[n * 4];
+            g += pixels[n * 4 + 1];
+            b += pixels[n * 4 + 2];
+            count++;
+          }
+        }
+
+        if (count > 0) {
+          next[p * 4] = r / count;
+          next[p * 4 + 1] = g / count;
+          next[p * 4 + 2] = b / count;
+          next[p * 4 + 3] = 255;
+          nextFilled[p] = 1;
+          changed = true;
+        }
+      }
+    }
+
+    pixels = next;
+    filled = nextFilled;
+
+    if (!changed) break;
+  }
+
+  const output = document.createElement("canvas");
+  output.width = w;
+  output.height = h;
+
+  const outCtx = output.getContext("2d");
+  const imageData = outCtx.createImageData(w, h);
+
+  imageData.data.set(pixels);
+  outCtx.putImageData(imageData, 0, 0);
+
+  return output;
+}
+
+document.getElementById("startButton").onclick = function() {
+  if (!originalImage) return;
+
+  if (!hasSelection) {
+    status.textContent = "Paint over something first!";
+    return;
+  }
+
+  status.textContent = "Cleaning selected area...";
+  results.style.display = "none";
+
+  setTimeout(function() {
+    try {
+      const source = document.createElement("canvas");
+      source.width = canvas.width;
+      source.height = canvas.height;
+
+      source.getContext("2d").drawImage(
+        originalImage, 0, 0,
+        canvas.width, canvas.height
+      );
+
+      beforeCanvas.width = canvas.width;
+      beforeCanvas.height = canvas.height;
+      beforeCanvas.getContext("2d").drawImage(source, 0, 0);
+
+      editedImage = basicCleanup(source, maskCanvas);
+
+      afterCanvas.width = editedImage.width;
+      afterCanvas.height = editedImage.height;
+      afterCanvas.getContext("2d").drawImage(editedImage, 0, 0);
+
+      results.style.display = "grid";
+      status.textContent =
+        "Done! Compare the before and after images below.";
+    } catch (error) {
+      status.textContent = "Something went wrong. Try a smaller photo.";
+    }
+  }, 50);
+};
+
+document.getElementById("downloadButton").onclick = function() {
+  if (!editedImage) return;
+
+  editedImage.toBlob(function(blob) {
+    if (!blob) {
+      status.textContent = "Could not export this image.";
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "photocuh-cleaned.png";
+    link.click();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }, "image/png");
+};
+
+document.getElementById("newPhotoButton").onclick = function() {
+  fileInput.value = "";
+  editor.style.display = "none";
+  importArea.style.display = "flex";
+  results.style.display = "none";
+  status.textContent = "";
+  originalImage = null;
+  editedImage = null;
+};
+</script>
+
+</body>
+</html>
